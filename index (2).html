@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Murdokus Online</title>
+<style>
+*{box-sizing:border-box;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+body{margin:0;font:15px/1.4 system-ui,sans-serif;background:#14161c;color:#eceff4}
+header{padding:14px 16px 0}h1{margin:0;font-size:22px}#cap{opacity:.7;font-size:13px}
+.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 16px;background:#1f232d;margin-top:10px}
+button,select{font:inherit;padding:8px 14px;border-radius:8px;border:0;background:#e0a458;color:#1a1200;cursor:pointer;font-weight:600}
+select{background:#2c3140;color:#eceff4}button:hover{filter:brightness(1.1)}
+#msg{min-height:1.6em;padding:8px 16px 0;font-weight:600;color:#e0a458}
+main{display:flex;flex-wrap:wrap;gap:20px;padding:12px 16px;justify-content:center;align-items:flex-start}
+#board{--cs:min(60px,calc((100vw - 56px)/var(--n)));display:grid;grid-template-columns:22px repeat(var(--n),var(--cs));grid-template-rows:22px repeat(var(--n),var(--cs));user-select:none}
+.h{display:grid;place-items:center;font-size:12px;opacity:.7;font-style:normal}
+.c{position:relative;display:grid;place-items:center;color:#222;font-size:calc(var(--cs)*.5);border:1px solid rgba(0,0,0,.3);cursor:pointer}
+.t{border-top:3px solid #000}.r{border-right:3px solid #000}.b{border-bottom:3px solid #000}.l{border-left:3px solid #000}
+.rn{position:absolute;top:1px;left:3px;font-size:calc(var(--cs)*.17);font-weight:700;opacity:.65;line-height:1}
+.tok{width:72%;height:72%;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 calc(var(--cs)*.38)/1 system-ui}
+.tok.new{animation:pop .55s cubic-bezier(.3,1.5,.5,1) var(--d,0s) both}
+.vic{background:#111}
+.hot{animation:pulse 1.1s ease-in-out 3}.kill{outline:3px solid gold;box-shadow:0 0 16px 4px gold;animation:pop .6s ease}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pulse{50%{filter:brightness(1.3)}}
+#side{width:min(430px,100%)}
+.pp{display:flex;gap:10px;padding:8px 10px;margin-bottom:8px;border-radius:10px;background:#1f232d;cursor:pointer;border:2px solid transparent;align-items:flex-start}
+.pp.sel{border-color:#e0a458}.pp.dn{opacity:.55}
+.pp .tok{flex:none;width:34px;height:34px;font:700 16px/1 system-ui}
+.pp ul{margin:2px 0 0;padding-left:16px}
+.rules{font-size:12.5px;opacity:.75;margin:8px 0 0}
+@page{size:A4 landscape;margin:8mm}
+@media print{
+body{background:#fff;color:#000}.ctl,#msg,.np{display:none!important}
+header{padding:0}#board{--cs:calc(150mm/var(--n))}
+main{flex-wrap:nowrap;padding:6mm 0 0;gap:8mm;justify-content:flex-start}
+#side{width:auto;flex:1}#people{columns:2;column-gap:5mm}
+.pp{background:#fff;border:1px solid #888;break-inside:avoid;font-size:11px;opacity:1!important;cursor:auto}
+.c .tok:not(.vic){display:none}.rules{opacity:1;font-size:10.5px}
+}
+</style></head><body>
+<header><h1>🔍 Murdokus Online</h1><div id="cap"></div></header>
+<div class="ctl">
+<label>Sospechosos: <input type="range" id="np" min="5" max="10" value="6"> <b id="npv">6</b> + víctima</label>
+<label>Dificultad: <select id="df"><option value="0">Fácil</option><option value="1" selected>Media</option><option value="2">Difícil</option></select></label>
+<button id="nw">🎲 Nuevo</button><button id="sv">✨ Solucionar</button><button id="pr">⬇ Descargar / imprimir (A4 horizontal)</button>
+</div>
+<div id="msg"></div>
+<main><div id="board"></div>
+<div id="side"><div id="people"></div>
+<p class="np rules">Elige un sospechoso de la lista y pulsa una casilla para colocarlo; pulsa una ficha para recogerla. Para guardar en PDF, elige «Guardar como PDF» en el diálogo de impresión.</p>
+<p class="rules"><b>Normas:</b> hay exactamente una persona (sospechoso o víctima) en cada fila y en cada columna. Las casillas con muebles no se pueden ocupar. «Junto a» = casilla contigua (arriba, abajo, izquierda o derecha) dentro de la misma sala. Norte = arriba, oeste = izquierda. El asesino es quien queda a solas con la víctima en su sala.</p></div></main>
+<script>
+const $=s=>document.querySelector(s),R=n=>Math.random()*n|0,sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=R(i--);[a[i],a[j]]=[a[j],a[i]]}return a};
+const RN=['Cocina','Salón','Dormitorio','Baño','Biblioteca','Garaje','Jardín','Despacho','Sótano','Terraza','Bodega'];
+const OB=[['🛋️','el sofá'],['🪴','la planta'],['📺','la tele'],['🛏️','la cama'],['🍽️','la mesa'],['🗄️','el armario'],['🧊','la nevera'],['🪔','la lámpara'],['🎹','el piano'],['🔥','la chimenea']];
+const NM=['Álex','Beto','Carla','Dani','Elena','Fran','Gala','Hugo','Iker','Julia','Kira','Leo'];
+function gen(np,df){
+ const N=np+1,NN=N*N,AD=[...Array(NN)].map((_,c)=>{const r=c/N|0,k=c%N,a=[];if(r)a.push(c-N);if(r<N-1)a.push(c+N);if(k)a.push(c-1);if(k<N-1)a.push(c+1);return a});
+ for(let at=0;at<40;at++){
+  const pr=sh([...Array(N).keys()]),pc=sh([...Array(N).keys()]),sol=pr.map((r,i)=>r*N+pc[i]);
+  const K=4+R(N-3),room=Array(NN).fill(-1);
+  sh([...Array(NN).keys()]).slice(0,K).forEach((c,i)=>room[c]=i);
+  for(;;){const o=[];for(let c=0;c<NN;c++)if(room[c]<0)AD[c].forEach(n=>room[n]>=0&&o.push([c,room[n]]));if(!o.length)break;const[c,k]=o[R(o.length)];room[c]=k}
+  const cn=Array(K).fill(0);sol.forEach(c=>cn[room[c]]++);
+  const vs=[...Array(N).keys()].filter(p=>cn[room[sol[p]]]==2);if(!vs.length)continue;
+  const v=vs[R(vs.length)];[sol[0],sol[v]]=[sol[v],sol[0]];
+  const kil=sol.findIndex((c,p)=>p&&room[c]==room[sol[0]]);
+  const obj=Array(NN).fill(-1),ss=new Set(sol);
+  for(let k=0;k<K;k++){const ts=sh([...OB.keys()]);sh([...Array(NN).keys()].filter(c=>room[c]==k&&!ss.has(c))).slice(0,1+R(3)).forEach((c,i)=>obj[c]=ts[i])}
+  const rn=sh(RN).slice(0,K),nm=sh(NM).slice(0,N);
+  const ev=(c,P)=>{const a=P[c.p],b=P[c.q],ra=a/N|0,ca=a%N,rb=b/N|0,cb=b%N,ad=()=>AD[a].some(n=>obj[n]==c.v&&room[n]==room[a]);
+   switch(c.k){case'room':return room[a]==c.v;case'nroom':return room[a]!=c.v;case'obj':return ad();case'nobj':return!ad();case'row':return ra==c.v;case'col':return ca==c.v;
+   case'N':return ra<rb;case'S':return ra>rb;case'W':return ca<cb;case'E':return ca>cb;case'same':return room[a]==room[b];case'nsame':return room[a]!=room[b];
+   default:return P.filter(x=>room[x]==room[a]).length==1}};
+  const solve=(cl,lim=6e4)=>{
+   const ct=Array(N).fill(0);cl.forEach(c=>ct[c.p]++);
+   const ord=[0,...sh([...Array(N-1).keys()].map(i=>i+1)).sort((a,b)=>ct[b]-ct[a])],pos=[];ord.forEach((p,i)=>pos[p]=i);
+   const lv=ord.map(()=>[]);cl.forEach(c=>lv[c.k=='alone'?N-1:Math.max(pos[c.p],pos[c.q])].push(c));
+   const free=[...Array(NN).keys()].filter(c=>obj[c]<0),P=Array(N).fill(-1),uR=[],uC=[];let n=0,f=0;
+   const rec=i=>{if(i==N){f++;return}const p=ord[i];
+    for(const c of i?free:[sol[0]]){if(f>1||++n>lim)return;const r=c/N|0,k=c%N;if(uR[r]||uC[k])continue;
+     P[p]=c;uR[r]=uC[k]=1;if(lv[i].every(x=>ev(x,P)))rec(i+1);uR[r]=uC[k]=0}P[p]=-1};
+   rec(0);return n>lim?3:f};
+  const pool=[],add=(k,p,v,q=0)=>pool.push({k,p,v,q,w:['room','obj','row','col'].includes(k)?0:1}),pres=[...new Set(obj.filter(x=>x>=0))];
+  for(let p=1;p<N;p++){const a=sol[p],r=a/N|0,cc=a%N,adj=t=>AD[a].some(n=>obj[n]==t&&room[n]==room[a]);
+   add('room',p,room[a]);add('row',p,r);add('col',p,cc);
+   sh([...Array(K).keys()].filter(k=>k!=room[a])).slice(0,2).forEach(k=>add('nroom',p,k));
+   pres.filter(adj).forEach(t=>add('obj',p,t));
+   sh(pres.filter(t=>!adj(t))).slice(0,2).forEach(t=>add('nobj',p,t));
+   if(cn[room[a]]==1)add('alone',p,0);
+   for(let q=0;q<N;q++)if(q!=p){const b=sol[q];add(r<(b/N|0)?'N':'S',p,0,q);add(cc<b%N?'W':'E',p,0,q);add(room[a]==room[b]?'same':'nsame',p,0,q)}}
+  const al=df==0?['room','obj','row','col','same']:df==1?['room','obj','row','col','same','N','S','W','E','alone','nroom']:null;
+  const P0=pool.filter(c=>!al||al.includes(c.k));
+  P0.forEach(c=>c.s=Math.random()+(df==2?-.6:df==0?.6:0)*c.w);P0.sort((a,b)=>a.s-b.s);
+  let cl=[],u=0;
+  for(const c of P0){cl.push(c);if(cl.length%3==0&&solve(cl)==1){u=1;break}}
+  if(!u&&solve(cl)==1)u=1;if(!u)continue;
+  for(let p=1;p<N;p++)if(!cl.some(c=>c.p==p))cl.push(P0.find(c=>c.p==p));
+  if(df)for(const c of sh(cl)){if(df==1&&R(10)<4)continue;const t=cl.filter(x=>x!=c);if(t.some(x=>x.p==c.p)&&solve(t)==1)cl=t}
+  if(solve(cl,3e5)!=1)continue;
+  return{N,room,obj,sol,cl:cl.sort((a,b)=>a.p-b.p),rn,nm,kil}}
+ return null}
+/*UI*/
+const txt=(c,g)=>{const q=g.nm[c.q],rn=g.rn;return({room:`estaba en ${rn[c.v]}`,nroom:`no estaba en ${rn[c.v]}`,obj:`estaba junto a ${OB[c.v][1]}`,nobj:`no estaba junto a ${OB[c.v][1]}`,row:`estaba en la fila ${c.v+1}`,col:`estaba en la columna ${c.v+1}`,N:`estaba más al norte que ${q}`,S:`estaba más al sur que ${q}`,W:`estaba más al oeste que ${q}`,E:`estaba más al este que ${q}`,same:`estaba en la misma sala que ${q}`,nsame:`no estaba en la misma sala que ${q}`,alone:`no tenía a nadie más en su sala`})[c.k]};
+const col=p=>`hsl(${p*53%360} 60% 38%)`,msg=t=>$('#msg').textContent=t;
+let G,M={},S=1,done=false;
+const nextP=()=>{for(let p=1;p<G.N;p++)if(M[p]==null)return p;return null};
+function draw(nw={}){
+ const{N,room,obj,sol,rn,nm}=G,seen=new Set(),at={};for(const p in M)at[M[p]]=+p;
+ let h='<i></i>'+[...Array(N)].map((_,i)=>`<i class="h">${i+1}</i>`).join('');
+ for(let r=0;r<N;r++){h+=`<i class="h">${r+1}</i>`;for(let c=0;c<N;c++){const i=r*N+c,k=room[i];
+  const b=[r?room[i-N]!=k:1,c<N-1?room[i+1]!=k:1,r<N-1?room[i+N]!=k:1,c?room[i-1]!=k:1].map((x,j)=>x?'trbl'[j]:'').join(' ');
+  const lab=seen.has(k)?'':(seen.add(k),`<span class="rn">${rn[k]}</span>`),p=at[i];
+  h+=`<div class="c ${b}" data-i="${i}" data-k="${k}" style="background:hsl(${k*43%360} 60% 84%)">${lab}${obj[i]>=0?OB[obj[i]][0]:''}${i==sol[0]?'<b class="tok vic">💀</b>':''}${p!=null?`<b class="tok${nw[p]!=null?' new':''}" style="background:${col(p)};--d:${nw[p]||0}s">${nm[p][0]}</b>`:''}</div>`}}
+ const bd=$('#board');bd.style.setProperty('--n',N);bd.innerHTML=h;
+ $('#people').innerHTML=nm.map((n,p)=>p?`<div class="pp${S==p?' sel':''}${M[p]!=null?' dn':''}" data-p="${p}"><b class="tok" style="background:${col(p)}">${n[0]}</b><div><b>${n}</b><ul>${G.cl.filter(c=>c.p==p).map(c=>`<li>${txt(c,G)}</li>`).join('')}</ul></div></div>`:`<div class="pp" style="cursor:auto"><b class="tok vic">💀</b><div><b>${n}</b> — la víctima. Está en la fila ${(sol[0]/N|0)+1}, columna ${sol[0]%N+1}.</div></div>`).join('')}
+function reveal(t){setTimeout(()=>{const{room,sol,kil,nm,rn}=G;
+ document.querySelectorAll(`.c[data-k="${room[sol[0]]}"]`).forEach(c=>c.classList.add('hot'));
+ const k=document.querySelector(`.c[data-i="${sol[kil]}"] .tok`);if(k)k.classList.add('kill');
+ msg(`🔍 El asesino es ${nm[kil]}: estaba a solas con la víctima en ${rn[room[sol[0]]]}.`)},t)}
+$('#board').onclick=e=>{const d=e.target.closest('.c');if(!d||done)return;msg('');
+ const i=+d.dataset.i,o=Object.keys(M).find(p=>M[p]==i);
+ if(o!=null){delete M[o];S=+o;return draw()}
+ if(S==null||G.obj[i]>=0||i==G.sol[0])return;
+ const p=S;M[p]=i;S=nextP();draw({[p]:0});
+ if(S==null){if(Object.keys(M).every(q=>M[q]==G.sol[q])){done=true;reveal(500)}else msg('Algo no cuadra: revisa las pistas.')}};
+$('#people').onclick=e=>{const d=e.target.closest('[data-p]');if(!d||done)return;msg('');const p=+d.dataset.p;if(M[p]!=null)delete M[p];S=p;draw()};
+$('#sv').onclick=()=>{if(!G)return;const nw={};let j=0;for(let p=1;p<G.N;p++){if(M[p]!=G.sol[p])nw[p]=.45*j++;M[p]=G.sol[p]}S=null;done=true;msg('');draw(nw);reveal(j*450+900)};
+$('#pr').onclick=()=>window.print();
+$('#np').oninput=()=>$('#npv').textContent=$('#np').value;
+function nuevo(){msg('⏳ Generando puzzle…');setTimeout(()=>{let g=null;for(let i=0;i<8&&!g;i++)g=gen(+$('#np').value,+$('#df').value);
+ if(!g)return msg('No se pudo generar. Pulsa Nuevo otra vez.');
+ G=g;M={};S=1;done=false;msg('');$('#cap').textContent=`${G.N-1} sospechosos + víctima · Dificultad ${['Fácil','Media','Difícil'][$('#df').value]} · Encuentra al asesino`;draw()},40)}
+$('#nw').onclick=nuevo;nuevo();
+</script></body></html>
