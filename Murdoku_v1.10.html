@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Murdoku v1.4</title>
+<title>Murdoku v1.9</title>
 <style>
 #startscreen{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 15%,#393260 0%,#171a29 48%,#0d1018 100%);text-align:center}
 .startcard{width:min(100%,620px);padding:clamp(28px,6vw,64px);border:1px solid #ffffff24;border-radius:30px;background:linear-gradient(145deg,#22283aee,#171c2bee);box-shadow:0 28px 90px #0009}
@@ -81,7 +81,7 @@ button,select{background:#252d3d;border-color:#3a455a;color:#f4f5fb}
 .pp.dn{opacity:.75}
 .pp ul{color:#b8c1d0}
 .pp li:before{color:#a79cff}
-.avatar{width:48px;height:48px;flex:none;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#353e56,#242c3e);font-size:27px;box-shadow:inset 0 1px 0 #ffffff22,0 5px 12px #0005}
+.avatar{width:48px;height:48px;flex:none;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#353e56,#242c3e);font-size:30px;box-shadow:inset 0 1px 0 #ffffff22,0 5px 12px #0005}
 .tok{border-radius:12px;border:2px solid #ffffff55;box-shadow:0 4px 10px #0008}
 .tok.person{font-size:calc(var(--cs)*.31);background:#303b52!important}
 .tok.vic{background:#d8b66f;color:#201a0d}
@@ -113,13 +113,13 @@ button,select{background:#252d3d;border-color:#3a455a;color:#f4f5fb}
 #board .rn{z-index:6;top:5px;left:5px;padding:3px 6px;border-radius:6px;background:#101622f2;color:#f6f2ff;font-size:clamp(8px,1.05vw,11px);line-height:1.1;max-width:calc(100% - 10px);white-space:nowrap;text-shadow:none;box-shadow:0 2px 5px #0005}
 #board .object{z-index:1}
 #board .cellpeople{z-index:3}
-#board .c.blocked{background-image:repeating-linear-gradient(135deg,#151b28aa 0 5px,#202a3a 5px 10px)!important}
-#board .c.blocked:after{content:"";position:absolute;inset:0;background:#080d1670;pointer-events:none}
+#board .c.blocked{filter:brightness(.78);background-image:none!important}
+#board .c.blocked:after{content:none}
 #noteboard{--cs:min(min(5.2vw,48px),calc((100vw - 600px)/var(--n)));display:grid;grid-template-columns:repeat(var(--n),var(--cs));grid-template-rows:repeat(var(--n),var(--cs));user-select:none;border:2px solid #c9cbd1;border-radius:5px;overflow:hidden;background:#fff;box-shadow:0 9px 22px #0004}
 #noteboard .c{background:#fff!important;border:1px solid #c9cbd1;color:#20242b}
 #noteboard .t,#noteboard .r,#noteboard .b,#noteboard .l{border-color:#aeb3bd}
 #noteboard .rn{z-index:4;top:3px;left:3px;background:#f4f5f7;color:#626a77;padding:2px 4px;border-radius:3px;font-size:9px;box-shadow:none;text-shadow:none}
-#noteboard .c.blocked{background:repeating-linear-gradient(135deg,#c6cbd3 0 5px,#e1e4e9 5px 10px)!important}
+#noteboard .c.blocked{background:#dfe3e9!important}
 #noteboard .c.blocked:after{content:none}\n#noteboard .blockedmark{position:absolute;inset:0;display:grid;place-items:center;color:#707887;font-size:clamp(15px,2vw,24px);font-weight:900;opacity:.8;pointer-events:none;z-index:1}
 .noteactions{width:min(100%,760px);display:flex;justify-content:flex-end}
 #clearnotes{font-size:12px;padding:7px 11px;background:#30394b;border-color:#46516a;color:#e9eaf4}
@@ -144,13 +144,17 @@ button,select{background:#252d3d;border-color:#3a455a;color:#f4f5fb}
 @keyframes resultIn{to{opacity:1;transform:translateY(0) scale(1)}}
 #noteboard .c.blocked:after{z-index:1}
 #noteboard .cellpeople{z-index:3}
+
+.version{font-size:.48em;vertical-align:middle;letter-spacing:0;font-weight:650;opacity:.62;margin-left:3px;white-space:nowrap}
+.timer{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid #59627a;border-radius:999px;background:#20283a;color:#f1edff;font:800 13px/1.2 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:620px){.timer{padding:6px 9px;font-size:12px}#pr{margin-left:0}}
 </style></head><body>
 <div id="startscreen"><div class="startcard"><div class="startlogo">MURD<span>OKU</span></div><p class="starttag">🌙 El club de los detectives<br>Encuentra al asesino. Resuelve el misterio.</p><button id="startbtn" type="button">EMPEZAR <span aria-hidden="true">→</span></button></div></div>
-<header><div><h1>🌙 MURD<span>OKU</span> <small class="version">v1.4</small></h1><div id="cap">El club de los detectives · Encuentra al asesino</div></div></header><button id="musicbtn" type="button" aria-pressed="true">♫ Música: activada</button>
+<header><div><h1>🌙 MURD<span>OKU</span> <small class="version">v1.9</small></h1><div id="cap">El club de los detectives · Encuentra al asesino</div></div></header><button id="musicbtn" type="button" aria-pressed="true">♫ Música: activada</button>
 <div class="ctl">
 <label>Sospechosos: <input type="range" id="np" min="5" max="10" value="6"> <b id="npv">6</b> + víctima</label>
 <label>Dificultad: <select id="df"><option value="0">Fácil</option><option value="1" selected>Media</option><option value="2">Difícil</option></select></label>
-<button id="nw">＋ Nuevo caso</button><button id="send">✓ Enviar</button><button id="sv">Ver solución</button><button id="pr">Imprimir / PDF</button>
+<button id="nw">＋ Nuevo caso</button><button id="send">✓ Enviar</button><button id="sv">Ver solución</button><button id="pr">Imprimir / PDF</button><span id="timer" class="timer" role="timer" aria-label="Tiempo de partida">⏱ 00:00</span>
 </div>
 <div id="msg"></div><div id="results" aria-live="polite"></div>
 <main>
@@ -159,9 +163,9 @@ button,select{background:#252d3d;border-color:#3a455a;color:#f4f5fb}
   <p class="hintline">Pulsa una tarjeta para elegir personaje y después una casilla. En el mapa de notas puedes repetir personajes sin límite.</p>
   <div id="people"></div>
   <p class="np rules">Selecciona un personaje para moverlo. Las filas y columnas ocupadas quedan bloqueadas.</p>
-  <p class="rules"><b>Normas:</b> una persona por fila y por columna, contando a la víctima. Las casillas con muebles no se pueden ocupar. «Junto a» significa una casilla contigua (arriba, abajo, izquierda o derecha) dentro de la misma sala. Norte es arriba y oeste es izquierda. El asesino estaba a solas con la víctima en su sala.</p>
+  <p class="rules"><b>Normas:</b> una persona por fila y por columna, contando a la víctima. Las casillas con muebles no se pueden ocupar, salvo sofás y sillones, donde alguien puede sentarse. «Junto a» significa una casilla contigua (arriba, abajo, izquierda o derecha) dentro de la misma sala. Norte es arriba y oeste es izquierda. El asesino estaba a solas con la víctima en su sala.</p>
 </section>
-<section id="boardwrap"><div class="boardpanel"><div class="boardheading"><b>Tablero de resolución</b><span>Coloca a cada sospechoso</span></div><div id="board"></div></div><div class="notepanel"><div class="boardheading"><b>Mapa de notas</b><span id="notestatus">Pruébalos aquí sin afectar la solución</span></div><div id="noteboard"></div><div class="noteactions"><button id="clearnotes" type="button">↺ Borrar todas las notas</button></div><p class="notehint">Bloc libre: coloca cualquier persona en cualquier casilla, incluso para probar hipótesis. Las × señalan filas, columnas y muebles bloqueados.</p></div></section>
+<section id="boardwrap"><div class="boardpanel"><div class="boardheading"><b>Tablero de resolución</b><span>Coloca a cada sospechoso</span></div><div id="board"></div></div><div class="notepanel"><div class="boardheading"><b>Mapa de notas</b><span id="notestatus">Pruébalos aquí sin afectar la solución</span></div><div id="noteboard"></div><div class="noteactions"><button id="clearnotes" type="button">↺ Borrar todas las notas</button></div><p class="notehint">Bloc libre: coloca personas en cualquier casilla para probar hipótesis. Los objetos también aparecen aquí; las notas no bloquean filas, columnas ni generan cruces.</p></div></section>
 </main>
 <script>
 const $=s=>document.querySelector(s),R=n=>Math.random()*n|0,sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=R(i--);[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -211,8 +215,8 @@ function gen(np,df){
    pres.filter(adj).forEach(t=>add('obj',p,t));
    sh(pres.filter(t=>!adj(t))).slice(0,2).forEach(t=>add('nobj',p,t));
    if(cn[room[a]]==1)add('alone',p,0);
-   for(let q=1;q<N;q++)if(q!=p){const b=sol[q];add(r<(b/N|0)?'N':'S',p,0,q);add(cc<b%N?'W':'E',p,0,q);add(room[a]==room[b]?'same':'nsame',p,0,q)}}
-  const al=df==0?['room','obj','same']:df==1?['room','obj','same','N','S','W','E','alone','nroom']:null;
+   for(let q=1;q<N;q++)if(q!=p){const b=sol[q];add(r<(b/N|0)?'N':'S',p,0,q);add(cc<b%N?'W':'E',p,0,q);/* No se generan pistas que relacionen a dos personas por compartir sala. */}}
+  const al=df==0?(N>=9?['room','obj','same','N','S','W','E']:['room','obj','same']):df==1?['room','obj','same','N','S','W','E','alone','nroom']:null;
   const P0=pool.filter(c=>!al||al.includes(c.k));
   P0.forEach(c=>c.s=Math.random()+(df==2?-.6:df==0?.6:0)*c.w);P0.sort((a,b)=>a.s-b.s);
   let cl=[],u=0;
@@ -221,12 +225,53 @@ function gen(np,df){
   for(let p=1;p<N;p++)if(!cl.some(c=>c.p==p))cl.push(P0.find(c=>c.p==p));
   if(df)for(const c of sh(cl)){if(df==1&&R(10)<4)continue;const t=cl.filter(x=>x!=c);if(t.some(x=>x.p==c.p)&&solve(t)==1)cl=t}
   if(solve(cl,3e5)!=1)continue;
-  return{N,room,obj,objImg,sol,cl:cl.sort((a,b)=>a.p-b.p),rn,nm,kil,av:sh(AV).slice(0,N)}}
+  const av=sh(AV).slice(0,N);return{N,room,obj,objImg,sol,cl:cl.sort((a,b)=>a.p-b.p),rn,nm,kil,av}}
  return null}
 /*UI*/
-const txt=(c,g)=>{const q=g.nm[c.q];return({room:`Estaba en ${g.rn[c.v]}.`,nroom:`No estaba en ${g.rn[c.v]}.`,obj:`Estaba junto a ${OB[c.v][1]}.`,nobj:`No estaba junto a ${OB[c.v][1]}.`,N:`Estaba al norte de ${q}.`,S:`Estaba al sur de ${q}.`,W:`Estaba al oeste de ${q}.`,E:`Estaba al este de ${q}.`,same:`Estaba en la misma sala que ${q}.`,nsame:`Estaba en otra sala distinta a ${q}.`,alone:`Era la única persona en su sala.`})[c.k]};
+const txt=(c,g)=>{const q=g.nm[c.q];return({room:`En ${g.rn[c.v]}.`,nroom:`No estaba en ${g.rn[c.v]}.`,obj:`Junto a ${OB[c.v][1]}.`,nobj:`No estaba junto a ${OB[c.v][1]}.`,N:`Al norte de ${q}.`,S:`Al sur de ${q}.`,W:`Al oeste de ${q}.`,E:`Al este de ${q}.`,same:`En la misma sala que ${q}.`,nsame:`En otra sala que ${q}.`,alone:`A solas en su sala.`})[c.k]};
 const col=p=>`hsl(${p*53%360} 58% 48%)`,msg=t=>$('#msg').textContent=t;
-let G,M={},MN={},S=1,done=false;
+let G,M={},MN={},S=1,done=false,checking=false;
+const SAVE_KEY='murdoku_save_v17';
+let timerElapsedMs=0,timerStartedAt=null,timerInterval=null;
+function timerValue(){return timerStartedAt==null?timerElapsedMs:timerElapsedMs+(Date.now()-timerStartedAt);}
+function formatTime(ms){
+ const total=Math.floor(Math.max(0,ms)/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),sec=total%60;
+ return h?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function paintTimer(){const el=$('#timer');if(el)el.textContent='⏱ '+formatTime(timerValue());}
+function startTimer(reset=false){
+ if(reset){timerElapsedMs=0;timerStartedAt=null;}
+ if(timerStartedAt==null)timerStartedAt=Date.now();
+ if(timerInterval)clearInterval(timerInterval);
+ paintTimer();timerInterval=setInterval(paintTimer,250);persistGame();
+}
+function stopTimer(){
+ if(timerStartedAt!=null){timerElapsedMs=timerValue();timerStartedAt=null;}
+ if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+ paintTimer();persistGame();
+}
+function resetTimer(){
+ if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+ timerElapsedMs=0;timerStartedAt=null;paintTimer();persistGame();
+}
+function persistGame(){
+ if(!G)return;
+ try{localStorage.setItem(SAVE_KEY,JSON.stringify({G,M,MN,S,done,timerElapsedMs:timerValue(),timerRunning:timerStartedAt!=null}));}catch(err){console.warn('No se pudo guardar la partida:',err);}
+}
+function restoreGame(){
+ try{
+  const raw=localStorage.getItem(SAVE_KEY);if(!raw)return false;
+  const data=JSON.parse(raw),g=data.G;
+  if(!g||!Number.isInteger(g.N)||!Array.isArray(g.sol)||g.sol.length!==g.N||!Array.isArray(g.room)||g.room.length!==g.N*g.N||!Array.isArray(g.nm)||g.nm.length!==g.N)return false;
+  G=g;M=data.M&&typeof data.M==='object'?data.M:{};
+  MN=data.MN&&typeof data.MN==='object'?data.MN:{};
+  S=Number.isInteger(data.S)?data.S:null;done=!!data.done;checking=false;timerElapsedMs=Number.isFinite(data.timerElapsedMs)?data.timerElapsedMs:0;timerStartedAt=null;if(timerInterval){clearInterval(timerInterval);timerInterval=null;}paintTimer();
+  $('#cap').textContent=`${G.N-1} sospechosos · Partida recuperada · Encuentra al asesino`;
+  draw();msg('Partida recuperada automáticamente. ¡Continúa donde lo dejaste!');if(data.timerRunning&&!done)startTimer(false);
+  $('#send').disabled=done;
+  return true;
+ }catch(err){console.warn('No se pudo recuperar la partida:',err);return false;}
+}
 const nextP=()=>{for(let p=1;p<G.N;p++)if(M[p]==null)return p;return null};
 function positionIndex(value){return typeof value==='number'?value:value.i}
 function blockedMap(positions){
@@ -247,10 +292,13 @@ function makeGrid(target,positions,mini=false){
   const edges=[r?room[i-N]!=k:1,c<N-1?room[i+1]!=k:1,r<N-1?room[i+N]!=k:1,c?room[i-1]!=k:1].map((x,j)=>x?'trbl'[j]:'').join(' ');
   const label=seen.has(k)?'':(seen.add(k),`<span class="rn">${rn[k]}</span>`);
   const people=at[i]||[];
-  const furniture=!mini&&obj[i]>=0?`<img class="object" src="${IMG[objImg[i]]}" alt="${OB[obj[i]][1]}">`:'';
-  const blocked=usedRows.has(r)||usedCols.has(c)||obj[i]>=0;
-  const blockedMark=mini&&blocked?'<span class="blockedmark" aria-hidden="true">×</span>':'';
-  const personMarks=people.length?`<div class="cellpeople">${people.map(p=>`<b class="tok person" title="${G.nm[p]}">${av[p]}</b>`).join('')}</div>`:'';
+  const furniture=obj[i]>=0?`<img class="object" src="${IMG[objImg[i]]}" alt="${OB[obj[i]][1]}" title="${OB[obj[i]][1]}">`:'';
+  // El bloc es un mapa de ideas: colocar una nota nunca bloquea filas,
+  // columnas ni muebles y no dibuja cruces alrededor.
+  const seat=obj[i]>=0&&['sofa','armchair'].includes(OB[obj[i]][0]);
+  const blocked=!mini&&(usedRows.has(r)||usedCols.has(c)||(obj[i]>=0&&!seat));
+  const blockedMark='';
+  const personMarks=people.length?`<div class="cellpeople">${people.map(p=>`<b class="tok person" title="${G.nm[p]}">${String.fromCharCode(64+p)}</b>`).join('')}</div>`:'';
   h+=`<div class="c ${edges}${blocked?' blocked':''}${people.length?' haspeople':''}" data-i="${i}" data-mini="${mini?1:0}" style="${mini?'':'background:hsl('+k*43+' 22% 30%)'}">${label}${furniture}${blockedMark}${personMarks}</div>`;
  }
  target.style.setProperty('--n',N);target.innerHTML=h;
@@ -260,12 +308,13 @@ function draw(){
  makeGrid($('#board'),M,false);
  const noteView={...Object.fromEntries(Object.entries(M).map(([p,i])=>[`main_${p}`,{p:+p,i}])),...MN};
  makeGrid($('#noteboard'),noteView,true);
- $('#people').innerHTML=nm.map((n,p)=>p?`<div class="pp${S==p?' sel':''}${M[p]!=null?' dn':''}" data-p="${p}"><span class="avatar">${av[p]}</span><div><b>${n}</b><ul>${G.cl.filter(c=>c.p==p).map(c=>`<li>${txt(c,G)}</li>`).join('')}</ul></div></div>`:`<div class="pp victim-card" style="cursor:default"><span class="avatar">V</span><div><b>V · Víctima</b><ul><li>La víctima</li></ul></div></div>`).join('');
+ $('#people').innerHTML=nm.slice(1).map((n,j)=>{const p=j+1,seat=M[p]!=null&&G.obj[M[p]]>=0&&['sofa','armchair'].includes(OB[G.obj[M[p]]][0]);const seatText=seat?'Está sentado'+(Object.entries(M).filter(([q,i])=>+q!==p&&G.obj[i]>=0&&['sofa','armchair'].includes(OB[G.obj[i]][0])).length===0?' · es el único que está sentado':'')+'.':'';return `<div class="pp${S==p?' sel':''}${M[p]!=null?' dn':''}" data-p="${p}"><span class="avatar">${av[p]}</span><div><b>${n}</b><ul>${G.cl.filter(c=>c.p==p).slice(0,3).map(c=>`<li>${txt(c,G)}</li>`).join('')}${seatText?`<li>${seatText}</li>`:''}</ul></div></div>`}).join('')+`<div class="pp victim-card" style="cursor:default"><span class="avatar">V</span><div><b>V · Víctima</b></div></div>`;
  const miniStatus=$('#notestatus');
- miniStatus.textContent=`Bloc de notas · ${Object.keys(M).length} en tablero + ${Object.keys(MN).length} notas`; 
+ miniStatus.textContent=`Bloc de notas · ${Object.keys(M).length} en tablero + ${Object.keys(MN).length} notas`;
+ persistGame();
 }
 function reveal(){
- const{kil,nm}=G;done=true;
+ const{kil,nm}=G;done=true;resetTimer();persistGame();
  $('#results').insertAdjacentHTML('beforeend',`<div class="result-banner">✨ ¡Caso resuelto! El asesino era ${nm[kil]} ✨</div>`);
  msg(`¡Perfecto! Todas las posiciones son correctas.`);
 }
@@ -289,7 +338,7 @@ function placeOn(target,positions,mini){
  if(!mini&&(usedRows.has(r)||usedCols.has(c))){
   msg('Casilla bloqueada: hay otra ficha en esa fila o columna.');return;
  }
- if(!mini&&G.obj[i]>=0){msg('No puedes colocar a nadie ahí: hay un mueble.');return}
+ if(!mini&&G.obj[i]>=0&&!['sofa','armchair'].includes(OB[G.obj[i]][0])){msg('No puedes colocar a nadie ahí: hay un mueble.');return}
  if(mini){
   const id=`n${Date.now()}_${Math.random().toString(36).slice(2)}`;
   MN[id]={p:S,i};
@@ -315,7 +364,8 @@ $('#send').onclick=async()=>{
  checking=true;$('#send').disabled=true;$('#results').innerHTML='';
  msg('🔎 Revisando el caso… Los resultados aparecerán uno a uno.');
  let allCorrect=true;
- for(let p=1;p<G.N;p++){
+ try{
+  for(let p=1;p<G.N;p++){
    const ok=M[p]===G.sol[p];if(!ok)allCorrect=false;
    const chip=document.createElement('div');
    chip.className='result-chip '+(ok?'good':'bad');
@@ -323,23 +373,41 @@ $('#send').onclick=async()=>{
    chip.innerHTML=`<span>${ok?'✓':'↺'}</span><span>${G.av[p]} ${G.nm[p]} · ${ok?'¡Correcto!':'Revisa su posición'}</span>`;
    $('#results').appendChild(chip);
    await new Promise(resolve=>setTimeout(resolve,430));
- }
- if(allCorrect){reveal();}
- else{msg('Hay algunas posiciones que revisar. Puedes mover las fichas y volver a comprobar.');}
- checking=false;$('#send').disabled=false;
+  }
+  if(allCorrect){reveal();}
+  else{msg('Hay algunas posiciones que revisar. Puedes mover las fichas y volver a comprobar.');}
+ }catch(err){console.error('Error al corregir:',err);msg('Ha ocurrido un error al corregir. Prueba a generar un caso nuevo.');}
+ finally{checking=false;$('#send').disabled=false;}
 };
 $('#sv').onclick=()=>{
  if(!G)return;
  for(let p=1;p<G.N;p++)M[p]=G.sol[p];
- S=null;done=true;draw();msg(`Solución: el asesino es ${G.nm[G.kil]}.`);
+ S=null;done=true;resetTimer();draw();msg(`Solución: el asesino es ${G.nm[G.kil]}.`);
 };
 $('#pr').onclick=()=>window.print();
 $('#clearnotes').onclick=()=>{MN={};draw();msg('Bloc de notas limpio.');};
 $('#np').oninput=()=>$('#npv').textContent=$('#np').value;
-function nuevo(){msg('⏳ Generando puzzle…');setTimeout(()=>{let g=null;for(let i=0;i<8&&!g;i++)g=gen(+$('#np').value,+$('#df').value);
- if(!g)return msg('No se pudo generar. Pulsa «Nuevo caso» para intentarlo otra vez.');
- G=g;M={};MN={};S=1;done=false;msg('Selecciona un sospechoso y coloca su ficha en el tablero.');$('#cap').textContent=`${G.N-1} sospechosos · Dificultad ${['Fácil','Media','Difícil'][$('#df').value]} · Encuentra al asesino`;draw()},40)}
-$('#startbtn').onclick=()=>{document.body.classList.add('started');startMusic();nuevo();};
+function nuevo(){
+ checking=false;done=false;stopTimer();timerElapsedMs=0;timerStartedAt=null;paintTimer();$('#send').disabled=false;$('#results').innerHTML='';
+ msg('⏳ Generando puzzle…');
+ setTimeout(()=>{
+  let g=null,attempts=0,lastError=null;
+  while(!g&&attempts<24){
+   attempts++;
+   try{g=gen(+$('#np').value,+$('#df').value)}catch(err){lastError=err;console.error('Error generando caso:',err)}
+  }
+  if(!g){
+   msg('No se ha podido generar este caso. Prueba otra dificultad o pulsa «Nuevo caso» para reintentar.');
+   if(lastError)console.error(lastError);
+   return;
+  }
+  G=g;M={};MN={};S=1;done=false;checking=false;
+  msg('Selecciona un sospechoso y coloca su ficha en el tablero.');
+  $('#cap').textContent=`${G.N-1} sospechosos · Dificultad ${['Fácil','Media','Difícil'][$('#df').value]} · Encuentra al asesino`;
+  draw();startTimer(true);
+ },40)
+}
+$('#startbtn').onclick=()=>{document.body.classList.add('started');startMusic();if(!G)nuevo();else if(!done&&timerStartedAt==null)startTimer(false);};
 $('#nw').onclick=nuevo;
 
 // Banda sonora en bucle: las dos pistas se reproducen en orden y vuelven a empezar.
@@ -351,9 +419,27 @@ const music=new Audio(); music.preload='auto'; music.loop=false;
 let trackIndex=0,musicOn=true;
 music.src=playlist[trackIndex];
 const musicButton=$('#musicbtn');
-function updateMusicButton(){musicButton.textContent=musicOn?'♫ Música: activada':'♫ Música: apagada';musicButton.setAttribute('aria-pressed',String(musicOn));}
-function startMusic(){if(!musicOn)return;music.play().then(updateMusicButton).catch(()=>{musicButton.textContent='♫ Tocar música';});}
-music.addEventListener('ended',()=>{trackIndex=(trackIndex+1)%playlist.length;music.src=playlist[trackIndex];if(musicOn)startMusic();});
-musicButton.onclick=()=>{musicOn=!musicOn;if(musicOn)startMusic();else music.pause();updateMusicButton();};
+function updateMusicButton(){
+ const label=!musicOn?'♫ Música: apagada':music.paused?'♫ Reintentar música':'♫ Música: activada';
+ musicButton.textContent=label;
+ musicButton.setAttribute('aria-pressed',String(musicOn));
+}
+function startMusic(){
+ if(!musicOn)return;
+ if(!music.src)music.src=playlist[trackIndex];
+ music.play().then(updateMusicButton).catch(()=>{musicButton.textContent='♫ Reintentar música';musicButton.setAttribute('aria-pressed','true');});
+}
+music.addEventListener('ended',()=>{
+ trackIndex=(trackIndex+1)%playlist.length;
+ music.src=playlist[trackIndex];
+ if(musicOn)startMusic();
+});
+music.addEventListener('error',()=>{musicButton.textContent='♫ Error de audio · reintentar';});
+musicButton.onclick=()=>{
+ if(!musicOn){musicOn=true;startMusic();return;}
+ if(music.paused){startMusic();return;}
+ musicOn=false;music.pause();updateMusicButton();
+};
 updateMusicButton();
+restoreGame();
 </script></body></html>
